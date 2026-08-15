@@ -98,7 +98,7 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
-private const val POLL_INTERVAL_MS = 10_000L
+private const val POLL_INTERVAL_MS = 5_000L
 
 private fun creditsPerPoll(bbox: BoundingBox): Int {
     val area = (bbox.latMax - bbox.latMin).let { max(it, -it) } *
@@ -115,9 +115,9 @@ private fun adaptivePollInterval(remaining: Int?, credits: Int): Long {
     val base = POLL_INTERVAL_MS * credits
     return when {
         remaining == null -> base
-        remaining < 10 -> 120_000L
-        remaining < 25 -> 60_000L
-        remaining < 60 -> 30_000L
+        remaining < 5 -> 60_000L
+        remaining < 15 -> 30_000L
+        remaining < 40 -> 15_000L
         else -> base
     }
 }
@@ -898,60 +898,117 @@ fun planeBitmap(context: Context, heading: Float, onGround: Boolean, icon: Aircr
 
             AircraftIcon.AIRCRAFT -> {
                 val s = size.toFloat()
-                val planeFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = if (onGround) AndroidColor.rgb(168, 178, 198)
-                    else AndroidColor.rgb(79, 163, 255)
-                    style = Paint.Style.FILL
-                }
-                val planeOutline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = if (onGround) AndroidColor.rgb(74, 82, 96)
-                    else AndroidColor.rgb(18, 64, 120)
-                    style = Paint.Style.STROKE
-                    strokeWidth = 1.5f * density
-                    strokeJoin = Paint.Join.ROUND
-                }
-
-                val fuselage = Path().apply {
-                    moveTo(cx, cy - 0.46f * s)
-                    lineTo(cx + 0.055f * s, cy - 0.38f * s)
-                    lineTo(cx + 0.055f * s, cy + 0.36f * s)
-                    lineTo(cx, cy + 0.44f * s)
-                    lineTo(cx - 0.055f * s, cy + 0.36f * s)
-                    lineTo(cx - 0.055f * s, cy - 0.38f * s)
+                val silhouette = Path().apply {
+                    moveTo(cx + 0.1602f * s, cy + 0.4990f * s)
+                    lineTo(cx + 0.1445f * s, cy + 0.4951f * s)
+                    lineTo(cx + 0.1348f * s, cy + 0.4951f * s)
+                    lineTo(cx + 0.1328f * s, cy + 0.4932f * s)
+                    lineTo(cx + 0.1230f * s, cy + 0.4932f * s)
+                    lineTo(cx + 0.1113f * s, cy + 0.4893f * s)
+                    lineTo(cx + 0.0781f * s, cy + 0.4854f * s)
+                    lineTo(cx + 0.0664f * s, cy + 0.4814f * s)
+                    lineTo(cx + 0.0449f * s, cy + 0.4795f * s)
+                    lineTo(cx + 0.0332f * s, cy + 0.4756f * s)
+                    lineTo(cx + 0.0117f * s, cy + 0.4736f * s)
+                    lineTo(cx + 0.0098f * s, cy + 0.4717f * s)
+                    lineTo(cx + -0.0117f * s, cy + 0.4717f * s)
+                    lineTo(cx + -0.0234f * s, cy + 0.4756f * s)
+                    lineTo(cx + -0.1016f * s, cy + 0.4873f * s)
+                    lineTo(cx + -0.1035f * s, cy + 0.4893f * s)
+                    lineTo(cx + -0.1348f * s, cy + 0.4932f * s)
+                    lineTo(cx + -0.1465f * s, cy + 0.4971f * s)
+                    lineTo(cx + -0.1631f * s, cy + 0.4980f * s)
+                    lineTo(cx + -0.1631f * s, cy + 0.4453f * s)
+                    lineTo(cx + -0.0537f * s, cy + 0.3848f * s)
+                    lineTo(cx + -0.0576f * s, cy + 0.2676f * s)
+                    lineTo(cx + -0.0596f * s, cy + 0.2656f * s)
+                    lineTo(cx + -0.0596f * s, cy + 0.2227f * s)
+                    lineTo(cx + -0.0615f * s, cy + 0.2207f * s)
+                    lineTo(cx + -0.0615f * s, cy + 0.1777f * s)
+                    lineTo(cx + -0.0635f * s, cy + 0.1758f * s)
+                    lineTo(cx + -0.0635f * s, cy + 0.1328f * s)
+                    lineTo(cx + -0.0654f * s, cy + 0.1309f * s)
+                    lineTo(cx + -0.0654f * s, cy + 0.0879f * s)
+                    lineTo(cx + -0.0674f * s, cy + 0.0859f * s)
+                    lineTo(cx + -0.0684f * s, cy + 0.0557f * s)
+                    lineTo(cx + -0.2148f * s, cy + 0.1143f * s)
+                    lineTo(cx + -0.2246f * s, cy + 0.1201f * s)
+                    lineTo(cx + -0.2480f * s, cy + 0.1279f * s)
+                    lineTo(cx + -0.2578f * s, cy + 0.1338f * s)
+                    lineTo(cx + -0.2812f * s, cy + 0.1416f * s)
+                    lineTo(cx + -0.2910f * s, cy + 0.1475f * s)
+                    lineTo(cx + -0.3145f * s, cy + 0.1553f * s)
+                    lineTo(cx + -0.3242f * s, cy + 0.1611f * s)
+                    lineTo(cx + -0.4043f * s, cy + 0.1924f * s)
+                    lineTo(cx + -0.4141f * s, cy + 0.1982f * s)
+                    lineTo(cx + -0.4238f * s, cy + 0.2021f * s)
+                    lineTo(cx + -0.4268f * s, cy + 0.2012f * s)
+                    lineTo(cx + -0.4268f * s, cy + 0.1211f * s)
+                    lineTo(cx + -0.2705f * s, cy + 0.0059f * s)
+                    lineTo(cx + -0.2686f * s, cy + 0.0020f * s)
+                    lineTo(cx + -0.2676f * s, cy + -0.0869f * s)
+                    lineTo(cx + -0.2051f * s, cy + -0.0869f * s)
+                    lineTo(cx + -0.2041f * s, cy + -0.0469f * s)
+                    lineTo(cx + -0.2012f * s, cy + -0.0459f * s)
+                    lineTo(cx + -0.0732f * s, cy + -0.1406f * s)
+                    lineTo(cx + -0.0732f * s, cy + -0.3496f * s)
+                    lineTo(cx + -0.0713f * s, cy + -0.3516f * s)
+                    lineTo(cx + -0.0713f * s, cy + -0.3730f * s)
+                    lineTo(cx + -0.0693f * s, cy + -0.3750f * s)
+                    lineTo(cx + -0.0674f * s, cy + -0.3984f * s)
+                    lineTo(cx + -0.0576f * s, cy + -0.4355f * s)
+                    lineTo(cx + -0.0439f * s, cy + -0.4668f * s)
+                    lineTo(cx + -0.0361f * s, cy + -0.4785f * s)
+                    lineTo(cx + -0.0195f * s, cy + -0.4951f * s)
+                    lineTo(cx + -0.0078f * s, cy + -0.5010f * s)
+                    lineTo(cx + 0.0059f * s, cy + -0.5010f * s)
+                    lineTo(cx + 0.0176f * s, cy + -0.4951f * s)
+                    lineTo(cx + 0.0342f * s, cy + -0.4785f * s)
+                    lineTo(cx + 0.0479f * s, cy + -0.4551f * s)
+                    lineTo(cx + 0.0635f * s, cy + -0.4082f * s)
+                    lineTo(cx + 0.0674f * s, cy + -0.3750f * s)
+                    lineTo(cx + 0.0693f * s, cy + -0.3730f * s)
+                    lineTo(cx + 0.0693f * s, cy + -0.3516f * s)
+                    lineTo(cx + 0.0713f * s, cy + -0.3496f * s)
+                    lineTo(cx + 0.0713f * s, cy + -0.1406f * s)
+                    lineTo(cx + 0.1992f * s, cy + -0.0459f * s)
+                    lineTo(cx + 0.2021f * s, cy + -0.0469f * s)
+                    lineTo(cx + 0.2031f * s, cy + -0.0869f * s)
+                    lineTo(cx + 0.2656f * s, cy + -0.0869f * s)
+                    lineTo(cx + 0.2666f * s, cy + 0.0020f * s)
+                    lineTo(cx + 0.2686f * s, cy + 0.0059f * s)
+                    lineTo(cx + 0.4248f * s, cy + 0.1211f * s)
+                    lineTo(cx + 0.4238f * s, cy + 0.2021f * s)
+                    lineTo(cx + 0.3652f * s, cy + 0.1787f * s)
+                    lineTo(cx + 0.3555f * s, cy + 0.1729f * s)
+                    lineTo(cx + 0.3320f * s, cy + 0.1650f * s)
+                    lineTo(cx + 0.3223f * s, cy + 0.1592f * s)
+                    lineTo(cx + 0.2988f * s, cy + 0.1514f * s)
+                    lineTo(cx + 0.2891f * s, cy + 0.1455f * s)
+                    lineTo(cx + 0.2656f * s, cy + 0.1377f * s)
+                    lineTo(cx + 0.2559f * s, cy + 0.1318f * s)
+                    lineTo(cx + 0.2324f * s, cy + 0.1240f * s)
+                    lineTo(cx + 0.2227f * s, cy + 0.1182f * s)
+                    lineTo(cx + 0.1992f * s, cy + 0.1104f * s)
+                    lineTo(cx + 0.1895f * s, cy + 0.1045f * s)
+                    lineTo(cx + 0.1660f * s, cy + 0.0967f * s)
+                    lineTo(cx + 0.1562f * s, cy + 0.0908f * s)
+                    lineTo(cx + 0.1328f * s, cy + 0.0830f * s)
+                    lineTo(cx + 0.1230f * s, cy + 0.0771f * s)
+                    lineTo(cx + 0.0996f * s, cy + 0.0693f * s)
+                    lineTo(cx + 0.0898f * s, cy + 0.0635f * s)
+                    lineTo(cx + 0.0703f * s, cy + 0.0557f * s)
+                    lineTo(cx + 0.0654f * s, cy + 0.0566f * s)
+                    lineTo(cx + 0.0518f * s, cy + 0.3848f * s)
+                    lineTo(cx + 0.1611f * s, cy + 0.4453f * s)
+                    lineTo(cx + 0.1602f * s, cy + 0.4990f * s)
                     close()
                 }
-                val rightWing = Path().apply {
-                    moveTo(cx + 0.055f * s, cy - 0.14f * s)
-                    lineTo(cx + 0.42f * s, cy - 0.10f * s)
-                    lineTo(cx + 0.30f * s, cy + 0.18f * s)
-                    lineTo(cx + 0.055f * s, cy + 0.10f * s)
-                    close()
-                }
-                val leftWing = Path().apply {
-                    moveTo(cx - 0.055f * s, cy - 0.14f * s)
-                    lineTo(cx - 0.42f * s, cy - 0.10f * s)
-                    lineTo(cx - 0.30f * s, cy + 0.18f * s)
-                    lineTo(cx - 0.055f * s, cy + 0.10f * s)
-                    close()
-                }
-                val rightTail = Path().apply {
-                    moveTo(cx + 0.055f * s, cy + 0.32f * s)
-                    lineTo(cx + 0.20f * s, cy + 0.36f * s)
-                    lineTo(cx + 0.16f * s, cy + 0.42f * s)
-                    lineTo(cx + 0.055f * s, cy + 0.40f * s)
-                    close()
-                }
-                val leftTail = Path().apply {
-                    moveTo(cx - 0.055f * s, cy + 0.32f * s)
-                    lineTo(cx - 0.20f * s, cy + 0.36f * s)
-                    lineTo(cx - 0.16f * s, cy + 0.42f * s)
-                    lineTo(cx - 0.055f * s, cy + 0.40f * s)
-                    close()
-                }
-                listOf(fuselage, rightWing, leftWing, rightTail, leftTail).forEach { p ->
-                    canvas.drawPath(p, planeFill)
-                    canvas.drawPath(p, planeOutline)
-                }
+                canvas.save()
+                canvas.scale(0.72f, 0.72f, cx, cy)
+                canvas.drawPath(silhouette, fill)
+                canvas.drawPath(silhouette, outline)
+                canvas.restore()
             }
         }
         bmp

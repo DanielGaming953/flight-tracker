@@ -1,0 +1,128 @@
+name: Build beta (Linux + Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/beta.yml'
+
+jobs:
+  linux:
+    name: Linux beta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build Linux portable app + fat jar (required)
+        working-directory: desktop
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon createDistributable fatJar
+
+      - name: Build Linux installers (best effort)
+        working-directory: desktop
+        run: |
+          ./gradlew --no-daemon packageDeb packageAppImage || echo "installer packaging skipped"
+
+      - name: Stage portable app + launcher
+        run: |
+          mkdir -p dist
+          cd desktop/build/compose/binaries/main
+          tar -czf ../../../../../dist/FlightTracker-linux-x64.tar.gz app
+
+      - name: Collect files
+        run: |
+          cp desktop/build/compose/binaries/main/appimage/*.AppImage dist/ || true
+          cp desktop/build/compose/binaries/main/deb/*.deb dist/ || true
+          cp desktop/build/libs/flight-tracker.jar dist/FlightTracker-linux-x64.jar || true
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flight-tracker-linux
+          path: dist
+
+  windows:
+    name: Windows beta
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install WiX (needed for .exe and .msi installers)
+        shell: powershell
+        run: choco install wixtoolset -y --no-progress
+
+      - name: Build Windows portable app + fat jar (required)
+        working-directory: desktop
+        shell: bash
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon createDistributable fatJar
+
+      - name: Build Windows installers (best effort, needs WiX)
+        working-directory: desktop
+        shell: bash
+        run: |
+          ./gradlew --no-daemon packageMsi packageExe || echo "installer packaging skipped"
+
+      - name: Stage portable app + launcher
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          Compress-Archive -Path desktop/build/compose/binaries/main/app -DestinationPath dist/FlightTracker-windows-x64.zip -Force
+
+      - name: Collect files
+        shell: powershell
+        run: |
+          Copy-Item desktop/build/compose/binaries/main/exe/*.exe dist/ -ErrorAction SilentlyContinue
+          Copy-Item desktop/build/compose/binaries/main/msi/*.msi dist/ -ErrorAction SilentlyContinue
+          Copy-Item desktop/build/libs/flight-tracker.jar dist/FlightTracker-windows-x64.jar -ErrorAction SilentlyContinue
+          Get-ChildItem dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flight-tracker-windows
+          path: dist
+
+  release:
+    name: Publish beta release
+    if: github.event_name == 'workflow_dispatch'
+    needs: [linux, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: flight-tracker-linux
+          path: dist/linux
+      - uses: actions/download-artifact@v4
+        with:
+          name: flight-tracker-windows
+          path: dist/windows
+      - name: Create / update beta release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release delete beta --yes --repo "${{ github.repository }}" 2>/dev/null || true
+          gh release create beta \
+            --repo "${{ github.repository }}" \
+            --title "Beta — Flight Tracker Desktop" \
+            --prerelease \
+            --notes "Auto-built from main. **Windows 10/11 and Linux** — supports the latest versions.\n\n**Linux:** .AppImage (run it), .deb (install), .tar.gz (portable), .jar\n**Windows:** .exe (install), .msi, .zip (portable), .jar\n\nJava 17+ required only for the .jar. The AppImage, installers and portable builds bundle everything." \
+            dist/linux/* dist/windows/*
