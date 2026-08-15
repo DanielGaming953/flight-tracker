@@ -38,9 +38,26 @@ jobs:
           cd desktop/build/compose/binaries/main
           tar -czf ../../../../../dist/FlightTracker-linux-x64.tar.gz app
 
+      - name: Build AppImage (single-file Linux app)
+        run: |
+          set -euo pipefail
+          APP="desktop/build/compose/binaries/main/app/FlightTrackerDesktop"
+          mkdir -p dist-appdir/FlightTracker.AppDir/usr/share/flighttracker
+          mkdir -p dist-appdir/FlightTracker.AppDir/usr/share/applications
+          mkdir -p dist-appdir/FlightTracker.AppDir/usr/share/icons/hicolor/256x256/apps
+          cp -r "$APP/bin" "$APP/lib" dist-appdir/FlightTracker.AppDir/usr/share/flighttracker/
+          cp "$APP/lib/FlightTrackerDesktop.png" dist-appdir/FlightTracker.AppDir/usr/share/icons/hicolor/256x256/apps/flighttracker.png
+          cp "$APP/lib/FlightTrackerDesktop.png" dist-appdir/FlightTracker.AppDir/flighttracker.png
+          printf '[Desktop Entry]\nName=Flight Tracker\nComment=Live flight tracker for OpenSky Network\nExec=FlightTrackerDesktop\nIcon=flighttracker\nTerminal=false\nType=Application\nCategories=Utility;Network;\n' > dist-appdir/FlightTracker.AppDir/usr/share/applications/flighttracker.desktop
+          cp dist-appdir/FlightTracker.AppDir/usr/share/applications/flighttracker.desktop dist-appdir/FlightTracker.AppDir/
+          printf '#!/bin/sh\nSELF="$(dirname "$(readlink -f "$0")")"\nexec "$SELF/usr/share/flighttracker/bin/FlightTrackerDesktop" "$@"\n' > dist-appdir/FlightTracker.AppDir/AppRun
+          chmod +x dist-appdir/FlightTracker.AppDir/AppRun
+          curl -sL --fail https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -o /tmp/appimagetool
+          chmod +x /tmp/appimagetool
+          APPIMAGE_EXTRACT_AND_RUN=1 /tmp/appimagetool dist-appdir/FlightTracker.AppDir dist/FlightTracker-linux-x64.AppImage
+
       - name: Collect files
         run: |
-          cp desktop/build/compose/binaries/main/appimage/*.AppImage dist/ || true
           cp desktop/build/compose/binaries/main/deb/*.deb dist/ || true
           cp desktop/build/libs/flight-tracker.jar dist/FlightTracker-linux-x64.jar || true
           ls -la dist
