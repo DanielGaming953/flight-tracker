@@ -211,6 +211,13 @@ fun SettingsScreen(
                 SwitchRow("Scroll wheel zooms", settings.scrollZoom) {
                     onSettingsChange(settings.copy(scrollZoom = it))
                 }
+                SwitchRow(
+                    "Invert scroll direction",
+                    settings.invertScrollZoom,
+                    subtitle = "On if your mouse uses natural scrolling"
+                ) {
+                    onSettingsChange(settings.copy(invertScrollZoom = it))
+                }
                 SwitchRow("Double-click zooms in", settings.doubleTapZoom) {
                     onSettingsChange(settings.copy(doubleTapZoom = it))
                 }
@@ -1086,6 +1093,7 @@ private fun IconOptionCard(
 private fun SwitchRow(
     label: String,
     checked: Boolean,
+    subtitle: String? = null,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Surface(
@@ -1101,14 +1109,24 @@ private fun SwitchRow(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 12.dp)
-            )
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             Switch(checked = checked, onCheckedChange = onCheckedChange)
         }
     }

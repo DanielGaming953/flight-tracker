@@ -92,6 +92,7 @@ data class Settings(
     val showClusters: Boolean = true,
     val showGround: Boolean = true,
     val scrollZoom: Boolean = true,
+    val invertScrollZoom: Boolean = false,
     val doubleTapZoom: Boolean = true,
     val pollIntervalSec: Int = 5,
     val startLat: Double = 50.0,

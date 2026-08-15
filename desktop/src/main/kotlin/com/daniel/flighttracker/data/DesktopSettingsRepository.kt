@@ -55,6 +55,7 @@ class SettingsRepository() {
         showClusters = props.getProperty(KEY_SHOW_CLUSTERS, "true").toBoolean(),
         showGround = props.getProperty(KEY_SHOW_GROUND, "true").toBoolean(),
         scrollZoom = props.getProperty(KEY_SCROLL_ZOOM, "true").toBoolean(),
+        invertScrollZoom = props.getProperty(KEY_INVERT_SCROLL_ZOOM, "false").toBoolean(),
         doubleTapZoom = props.getProperty(KEY_DOUBLE_TAP_ZOOM, "true").toBoolean(),
         pollIntervalSec = props.getProperty(KEY_POLL_INTERVAL, "5").toIntOrNull()?.coerceIn(2, 30) ?: 5,
         startLat = props.getProperty(KEY_START_LAT, "50").toDoubleOrNull()?.coerceIn(-85.0, 85.0) ?: 50.0,
@@ -107,6 +108,7 @@ class SettingsRepository() {
         props.setProperty(KEY_SHOW_CLUSTERS, settings.showClusters.toString())
         props.setProperty(KEY_SHOW_GROUND, settings.showGround.toString())
         props.setProperty(KEY_SCROLL_ZOOM, settings.scrollZoom.toString())
+        props.setProperty(KEY_INVERT_SCROLL_ZOOM, settings.invertScrollZoom.toString())
         props.setProperty(KEY_DOUBLE_TAP_ZOOM, settings.doubleTapZoom.toString())
         props.setProperty(KEY_POLL_INTERVAL, settings.pollIntervalSec.toString())
         props.setProperty(KEY_START_LAT, settings.startLat.toString())
@@ -149,6 +151,7 @@ class SettingsRepository() {
         const val KEY_SHOW_CLUSTERS = "show_clusters"
         const val KEY_SHOW_GROUND = "show_ground"
         const val KEY_SCROLL_ZOOM = "scroll_zoom"
+        const val KEY_INVERT_SCROLL_ZOOM = "invert_scroll_zoom"
         const val KEY_DOUBLE_TAP_ZOOM = "double_tap_zoom"
         const val KEY_POLL_INTERVAL = "poll_interval_sec"
         const val KEY_START_LAT = "start_lat"

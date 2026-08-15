@@ -653,15 +653,16 @@ private fun MapCanvas(
                             }
                             PointerEventType.Scroll -> {
                                 if (latestSettings.scrollZoom) {
+                                    val invert = if (latestSettings.invertScrollZoom) -1.0 else 1.0
                                     val delta = change.scrollDelta
                                     if (abs(delta.x) > abs(delta.y)) {
                                         mapState.pan(
-                                            -delta.x * mapState.viewportWidth * 0.03,
+                                            -delta.x * invert * mapState.viewportWidth * 0.03,
                                             0.0
                                         )
                                     } else {
                                         mapState.zoomAt(
-                                            if (delta.y > 0) 1.0 else -1.0,
+                                            invert * if (delta.y > 0) 1.0 else -1.0,
                                             change.position.x.toDouble(),
                                             change.position.y.toDouble()
                                         )
