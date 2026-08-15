@@ -5,6 +5,18 @@ Live flight tracking for **OpenSky Network** (with airplanes.live metadata), bui
 - **Android app** — in `app/`
 - **Desktop app (Linux / Windows)** — in `desktop/` (Compose for Desktop)
 
+## Ready-to-run builds
+
+The `dist/` folder holds the latest downloaded release binaries
+(`FlightTracker-linux-x64.AppImage` and `FlightTrackerDesktop-1.0.0.exe`).
+Refresh them with:
+
+```bash
+gh release download beta --repo DanielGaming953/flight-tracker --pattern "*.exe" --pattern "*.AppImage" --dir dist
+```
+
+> `dist/` is git-ignored — binaries live on the Releases page, not in the repo.
+
 ## Desktop downloads (beta)
 
 Grab the latest beta from the **[Releases](https://github.com/DanielGaming953/flight-tracker/releases)** page:

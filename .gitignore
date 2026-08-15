@@ -10,7 +10,10 @@ build/
 .cxx
 *.apk
 *.aab
+*.exe
+*.AppImage
 *.jks
 *.keystore
 *.log
 credentials.json
+dist/
